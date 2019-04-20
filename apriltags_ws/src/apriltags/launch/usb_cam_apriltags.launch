@@ -13,11 +13,12 @@
     <param name="~marker_thickness" value="0.02" />
 
     <rosparam command="delete" param="tag_data" />
+    <!-- The size is the outer layer length, unit Meter -->
     <rosparam param="tag_data">
-      "1": 
-        size: 0.035
-      "2":
-        size: 0.048
+      "14": 
+        size: 0.169
+      "17":
+        size: 0.169
     </rosparam>
 
     <remap from="~image" to="/usb_cam/image_raw"/>
