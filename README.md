@@ -52,8 +52,7 @@ How to Fly
 **2.apriltags ROS packages**
 ```
     cd ~/apriltags_ros/apriltags_ws
-    source environment.sh
-    catkin_make 
+    catkin_make
     source environment.sh
 ```
 
