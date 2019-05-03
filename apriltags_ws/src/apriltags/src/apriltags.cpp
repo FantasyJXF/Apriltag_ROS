@@ -60,6 +60,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <Eigen/Geometry>
 
 #include <visualization_msgs/MarkerArray.h>
+#include <geometry_msgs/PoseStamped.h>
+#include <geometry_msgs/TwistStamped.h>
 #include "yaml-cpp/yaml.h"
 #include <sstream>
 #include <fstream>
@@ -70,7 +72,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "apriltags.h"
 #include <apriltags/AprilTagDetections.h>
-
 
 using namespace std;
 
@@ -96,7 +97,6 @@ void GetMarkerTransformUsingOpenCV(const TagDetection& detection, Eigen::Matrix4
     }
 
     double tag_size = GetTagSize(detection.id);
-    ROS_WARN("______The tag_size is %.2f", tag_size);
     std::vector<cv::Point3f> object_pts;
     std::vector<cv::Point2f> image_pts;
     double tag_radius = tag_size/2.;
@@ -114,9 +114,8 @@ void GetMarkerTransformUsingOpenCV(const TagDetection& detection, Eigen::Matrix4
     cv::Matx33d intrinsics(camera_info_.K[0], 0, camera_info_.K[2],
                            0, camera_info_.K[4], camera_info_.K[5],
                            0, 0, 1);
-    ROS_WARN("#######  camera intrinsics fx is %.6f ", camera_info_.K[0]);
+
     cv::Vec4f distortion_coeff(camera_info_.D[0], camera_info_.D[1], camera_info_.D[2], camera_info_.D[3]);
-    ROS_WARN("#######  camera dist coeff is %.6f ", camera_info_.D[0]);
 
     // Estimate 3D pose of tag
     // Methods:
@@ -339,7 +338,8 @@ void ImageCallback(const sensor_msgs::ImageConstPtr& msg)
         Eigen::Quaternion<double> q(R);
         
         double tag_size = GetTagSize(detections[i].id);
-        cout << tag_size << " " << detections[i].id << endl;
+        // print the tag_size and id
+        //cout << tag_size << " " << detections[i].id << endl;
         
         // Fill in MarkerArray msg
         visualization_msgs::Marker marker_transform;
@@ -398,6 +398,8 @@ void ImageCallback(const sensor_msgs::ImageConstPtr& msg)
         }
         apriltag_detections.detections.push_back(apriltag_det);
 
+        rel_pose_publisher_.publish(apriltag_det.pose);
+        
         if ((viewer_) || (publish_detections_image_))
         {
             if (display_marker_outline_)
@@ -432,7 +434,7 @@ void ImageCallback(const sensor_msgs::ImageConstPtr& msg)
         }
     }
     marker_publisher_.publish(marker_transforms);
-    apriltag_publisher_.publish(apriltag_detections);
+    //apriltag_publisher_.publish(apriltag_detections);
 
     if(publish_detections_image_)
     {
@@ -450,7 +452,8 @@ void ConnectCallback(const ros::SingleSubscriberPublisher& info)
 {
     // Check for subscribers.
     uint32_t subscribers = marker_publisher_.getNumSubscribers()
-                           + apriltag_publisher_.getNumSubscribers();
+                        /*    + apriltag_publisher_.getNumSubscribers()*/
+                           + rel_pose_publisher_.getNumSubscribers();
     ROS_DEBUG("Subscription detected! (%d subscribers)", subscribers);
 
     if(subscribers && !running_)
@@ -478,7 +481,9 @@ void DisconnectCallback(const ros::SingleSubscriberPublisher& info)
 {
     // Check for subscribers.
     uint32_t subscribers = marker_publisher_.getNumSubscribers()
-                           + apriltag_publisher_.getNumSubscribers();
+                        /*   + apriltag_publisher_.getNumSubscribers() */
+                           + rel_pose_publisher_.getNumSubscribers();
+
     ROS_DEBUG("Unsubscription detected! (%d subscribers)", subscribers);
     
     if(!subscribers && running_)
@@ -538,8 +543,10 @@ void SetupPublisher()
     marker_publisher_ = node_->advertise<visualization_msgs::MarkerArray>(
             DEFAULT_MARKER_TOPIC, 1, connect_callback,
             disconnect_callback);
-    apriltag_publisher_ = node_->advertise<apriltags::AprilTagDetections>(
-            DEFAULT_DETECTIONS_TOPIC, 1, connect_callback, disconnect_callback);
+    // apriltag_publisher_ = node_->advertise<apriltags::AprilTagDetections>(
+    //         DEFAULT_DETECTIONS_TOPIC, 1, connect_callback, disconnect_callback);
+    rel_pose_publisher_ = node_->advertise<geometry_msgs::Pose>(
+            DEFAULT_REL_POSE_TOPIC, 1, connect_callback, disconnect_callback);
 
     if(publish_detections_image_)
     {

@@ -7,6 +7,7 @@ const std::string DEFAULT_IMAGE_TOPIC = "image";
 const std::string DEFAULT_CAMERA_INFO_TOPIC = "camera_info";
 const std::string DEFAULT_MARKER_TOPIC = "marker_array";
 const std::string DEFAULT_DETECTIONS_TOPIC = "detections";
+const std::string DEFAULT_REL_POSE_TOPIC = "rel_pose";
 const std::string DEFAULT_DETECTIONS_IMAGE_TOPIC = "detections_image";
 const double DEFAULT_TAG_SIZE = MED_TAG_SIZE;
 const std::string DEFAULT_DISPLAY_TYPE = "CUBE";
@@ -17,7 +18,9 @@ boost::shared_ptr<image_transport::ImageTransport> image_;
 sensor_msgs::CameraInfo camera_info_;
 
 ros::Publisher marker_publisher_;
-ros::Publisher apriltag_publisher_;
+//ros::Publisher apriltag_publisher_;
+ros::Publisher rel_pose_publisher_;
+
 image_transport::Publisher image_publisher_;
 ros::Subscriber info_subscriber;
 image_transport::Subscriber image_subscriber;
