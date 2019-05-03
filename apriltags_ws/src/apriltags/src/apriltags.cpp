@@ -96,7 +96,7 @@ void GetMarkerTransformUsingOpenCV(const TagDetection& detection, Eigen::Matrix4
     }
 
     double tag_size = GetTagSize(detection.id);
-
+    ROS_WARN("______The tag_size is %.2f", tag_size);
     std::vector<cv::Point3f> object_pts;
     std::vector<cv::Point2f> image_pts;
     double tag_radius = tag_size/2.;
@@ -114,8 +114,9 @@ void GetMarkerTransformUsingOpenCV(const TagDetection& detection, Eigen::Matrix4
     cv::Matx33d intrinsics(camera_info_.K[0], 0, camera_info_.K[2],
                            0, camera_info_.K[4], camera_info_.K[5],
                            0, 0, 1);
-    
+    ROS_WARN("#######  camera intrinsics fx is %.6f ", camera_info_.K[0]);
     cv::Vec4f distortion_coeff(camera_info_.D[0], camera_info_.D[1], camera_info_.D[2], camera_info_.D[3]);
+    ROS_WARN("#######  camera dist coeff is %.6f ", camera_info_.D[0]);
 
     // Estimate 3D pose of tag
     // Methods:
