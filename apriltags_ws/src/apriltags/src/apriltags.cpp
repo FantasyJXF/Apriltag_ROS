@@ -398,7 +398,14 @@ void ImageCallback(const sensor_msgs::ImageConstPtr& msg)
         }
         apriltag_detections.detections.push_back(apriltag_det);
 
-        rel_pose_publisher_.publish(apriltag_det.pose);
+		//ROS_WARN("apriltag_det.pose.position.x is %.3f, apriltag_det.pose.position.y is %.3f, apriltag_det.pose.position.z is %.3f",
+		//		apriltag_det.pose.position.x, apriltag_det.pose.position.y, apriltag_det.pose.position.z);
+
+		if(abs(apriltag_det.pose.position.x) > 1e-6 || abs(apriltag_det.pose.position.y) > 1e-6)
+		{
+			rel_pose_publisher_.publish(apriltag_det.pose);
+		}	
+
         
         if ((viewer_) || (publish_detections_image_))
         {
