@@ -5,6 +5,7 @@ project(apriltags)
 find_package(catkin REQUIRED COMPONENTS
   cv_bridge
   std_msgs
+  tf
   sensor_msgs
   image_transport
   roscpp

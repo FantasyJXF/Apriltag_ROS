@@ -58,6 +58,8 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <Eigen/Core>
 #include <Eigen/Geometry>
+// #include <tf/tf.h>
+// #include <tf/transform_datatypes.h>
 
 #include <visualization_msgs/MarkerArray.h>
 #include <geometry_msgs/PoseStamped.h>
@@ -375,6 +377,11 @@ void ImageCallback(const sensor_msgs::ImageConstPtr& msg)
         marker_transform.pose.orientation.z = q.z();
         marker_transform.pose.orientation.w = q.w();
         
+        // double uavRollENU, uavPitchENU, uavYawENU;
+        // tf::Quaternion quat;
+        // tf::quaternionMsgToTF(marker_transform.pose.orientation, quat);
+        // tf::Matrix3x3(quat).getRPY(uavRollENU, uavPitchENU, uavYawENU);
+
         marker_transform.color.r = 1.0;
         marker_transform.color.g = 0.0;
         marker_transform.color.b = 1.0;
@@ -403,7 +410,8 @@ void ImageCallback(const sensor_msgs::ImageConstPtr& msg)
 
 		if(abs(apriltag_det.pose.position.x) > 1e-6 || abs(apriltag_det.pose.position.y) > 1e-6)
 		{
-			rel_pose_publisher_.publish(apriltag_det.pose);
+			relative_position_publisher_.publish(apriltag_det.pose);
+            //vision_flag_publisher_.publish(apriltag_det.pose);
 		}	
 
         
@@ -460,7 +468,9 @@ void ConnectCallback(const ros::SingleSubscriberPublisher& info)
     // Check for subscribers.
     uint32_t subscribers = marker_publisher_.getNumSubscribers()
                         /*    + apriltag_publisher_.getNumSubscribers()*/
-                           + rel_pose_publisher_.getNumSubscribers();
+                           + relative_position_publisher_.getNumSubscribers();
+                           
+                           //+ vision_flag_publisher_.getNumSubscribers();
     ROS_DEBUG("Subscription detected! (%d subscribers)", subscribers);
 
     if(subscribers && !running_)
@@ -489,7 +499,9 @@ void DisconnectCallback(const ros::SingleSubscriberPublisher& info)
     // Check for subscribers.
     uint32_t subscribers = marker_publisher_.getNumSubscribers()
                         /*   + apriltag_publisher_.getNumSubscribers() */
-                           + rel_pose_publisher_.getNumSubscribers();
+                           + relative_position_publisher_.getNumSubscribers();
+                        //    + relative_yaw_publisher_.getNumSubscribers()
+                        //    + vision_flag_publisher_.getNumSubscribers();
 
     ROS_DEBUG("Unsubscription detected! (%d subscribers)", subscribers);
     
@@ -552,8 +564,12 @@ void SetupPublisher()
             disconnect_callback);
     // apriltag_publisher_ = node_->advertise<apriltags::AprilTagDetections>(
     //         DEFAULT_DETECTIONS_TOPIC, 1, connect_callback, disconnect_callback);
-    rel_pose_publisher_ = node_->advertise<geometry_msgs::Pose>(
-            DEFAULT_REL_POSE_TOPIC, 1, connect_callback, disconnect_callback);
+    relative_position_publisher_ = node_->advertise<geometry_msgs::Pose>(
+            DEFAULT_RELATIVE_POSITION_TOPIC, 1, connect_callback, disconnect_callback);
+    // relative_yaw_publisher_ = node_->advertise<geometry_msgs::Pose>(
+    //         DEFAULT_RELATIVE_YAW_TOPIC, 1, connect_callback, disconnect_callback);
+    // vision_flag_publisher_ = node_->advertise<geometry_msgs::Pose>(
+    //         DEFAULT_VISION_FLAG_TOPIC, 1, connect_callback, disconnect_callback);
 
     if(publish_detections_image_)
     {

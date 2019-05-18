@@ -7,7 +7,9 @@ const std::string DEFAULT_IMAGE_TOPIC = "image";
 const std::string DEFAULT_CAMERA_INFO_TOPIC = "camera_info";
 const std::string DEFAULT_MARKER_TOPIC = "marker_array";
 const std::string DEFAULT_DETECTIONS_TOPIC = "detections";
-const std::string DEFAULT_REL_POSE_TOPIC = "rel_pose";
+const std::string DEFAULT_RELATIVE_POSITION_TOPIC = "relative_position";
+// const std::string DEFAULT_RELATIVE_YAW_TOPIC = "relative_yaw";
+// const std::string DEFAULT_VISION_FLAG_TOPIC = "vision_flag";
 const std::string DEFAULT_DETECTIONS_IMAGE_TOPIC = "detections_image";
 const double DEFAULT_TAG_SIZE = MED_TAG_SIZE;
 const std::string DEFAULT_DISPLAY_TYPE = "CUBE";
@@ -19,7 +21,9 @@ sensor_msgs::CameraInfo camera_info_;
 
 ros::Publisher marker_publisher_;
 //ros::Publisher apriltag_publisher_;
-ros::Publisher rel_pose_publisher_;
+ros::Publisher relative_position_publisher_;
+// ros::Publisher relative_yaw_publisher_;
+// ros::Publisher vision_flag_publisher_;
 
 image_transport::Publisher image_publisher_;
 ros::Subscriber info_subscriber;
